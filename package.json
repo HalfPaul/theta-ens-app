@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bs58": "^4.0.1",
+    "content-hash": "^2.5.2",
     "cra-template": "1.1.2",
     "eth-ens-namehash": "^2.0.8",
+    "ethers": "^5.5.1",
     "js-sha3": "^0.8.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { labelhash, namehash, decodeContenthash, encodeContenthash } from "./utils";
-
+import { formatsByCoinType } from '@ensdomains/address-encoder';
 const registrarABI = require("./contracts/BaseRegistrarImplementation.json");
 const registryABI = require("./contracts/ENSregistryABI.json");
 const resolverABI = require("./contracts/PublicResolver.json");
@@ -53,9 +53,8 @@ export const getEthereumAddress = async(domain) => {
 }
 
 //Returns url of domain. If not set will return nothing.
-export const getUrl = async(domain) => {
+export const getText = async(domain, key) => {
     const label = namehash(domain + ".theta")
-    const key = "url"
     const link = await resolverContract['text(bytes32,string)'](label, key)
     return link
 }
@@ -92,11 +91,8 @@ export const changeController = async(domain, newAddress) => {
 export const changeRegistrant = async(domain, newAddress) => {
     const label = ethers.BigNumber.from(labelhash(domain)).toString()
 
-    const tx1 = await registrarContract.approve(newAddress, label)
-    tx1.wait(1)
-
-    const tx2 = await registrarContract.transferFrom(address, newAddress, label)
-    tx2.wait(1)
+    const tx = await registrarContract.transferFrom(address, newAddress, label)
+    tx.wait(1)
 }
 
 //Sets ethereum address.
@@ -106,10 +102,9 @@ export const setEthereumAddress = async(domain, ethAddress) => {
     tx.wait(1)
 }
 //Sets url for domain.
-export const setUrl = async(domain, url) => {
+export const setText = async(domain, text, key) => {
     const label = namehash(domain + ".theta")
-    const key = "url"
-    const tx = await resolverContract['setText(bytes32,string,string)'](label, key, url, {gasPrice: 4000000000000, gasLimit: 20000000})
+    const tx = await resolverContract['setText(bytes32,string,string)'](label, key, text, {gasPrice: 4000000000000, gasLimit: 20000000})
     tx.wait(1)
 }
 //Sets content hash. ipfs://dsfdbd...
@@ -130,7 +125,25 @@ export const getReverseName = async(reverseAddress) => {
 }
 
 //User sets the name for his address.
-export const setReverseName = async(name) => {
-    const tx = await reverseRegistrarContract.setName(name)
+export const setReverseName = async(name, address) => {
+    const ownerOfDomain = await getController(name.replace(".theta", ""))
+    if (ownerOfDomain == address) {
+        const tx = await reverseRegistrarContract.setName(name)
+        tx.wait(1)
+    } else {
+        alert("You are not the owner of this domain")
+    }
+}
+
+export const setBitcoinAddress = async(domain, BTCaddress) => {
+    const data = formatsByCoinType[0].decoder(BTCaddress);
+    const name = namehash(domain + ".theta")
+    const tx = await resolverContract['setAddr(bytes32,uint256,bytes)'](name, 0, data)
     tx.wait(1)
-  }
+}
+export const getBitcoinAddress = async(domain) => {
+    const name = namehash(domain + ".theta")
+    const data = await resolverContract['addr(bytes32,uint256)'](name, 0)
+    const address = formatsByCoinType[0].encoder(Buffer.from(data.slice(2), 'hex'))
+    return address
+}

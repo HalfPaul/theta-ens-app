@@ -10,13 +10,15 @@ export default function SetupReverse() {
     const nameRef = useRef("")
 
     const [name, setName] = useState("")
-
+    const [userAddress, setUserAddress] = useState("")
+    
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
 
+    
     useEffect( async() => {
-        const address = await signer.getAddress();
-        setName(await getReverseName(address))
+        setUserAddress(await signer.getAddress())
+        setName(await getReverseName(userAddress))
       }, [])
 
 
@@ -26,7 +28,7 @@ export default function SetupReverse() {
         <div className="setupComponent"> 
             <h1>Your current name: {name}</h1>
             <input className="reverseNameField" type="text" placeholder="Change name" ref={nameRef}/>
-            <button onClick={() => {setReverseName(nameRef.current.value)}}>Set name for your address</button>
+            <button onClick={() => {setReverseName(nameRef.current.value, userAddress)}}>Set name for your address</button>
         </div>
         </div>
     )

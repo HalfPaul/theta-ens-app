@@ -4,10 +4,11 @@ import { ethers } from "ethers";
 import { useState, useRef, useEffect } from "react";
 
 import { getRegistrant, getController,
-        getEthereumAddress, getUrl,
+        getEthereumAddress, setText,
         getContentHash, registerDomain,
         changeController, changeRegistrant,
-        setEthereumAddress, setUrl, setContentHash, isDomainAvailable } from '../ens.js';
+        setEthereumAddress, getText, setContentHash,
+        isDomainAvailable, setBitcoinAddress, getBitcoinAddress } from '../ens.js';
 
 
 
@@ -18,6 +19,7 @@ export default function Home() {
   const controllerRef = useRef("")
   const registrantRef = useRef("")
   const ethAddressRef = useRef("")
+  const bitcoinRef = useRef("")
   const urlRef = useRef("")
   const contentHashRef = useRef("")
 
@@ -27,6 +29,7 @@ export default function Home() {
   const [registrant, setRegistrant] = useState("")
   const [controller, setController] = useState("")
   const [ethAddress, setEthAddress] = useState("")
+  const [bitcoin, setBitcoin] = useState("")
   const [url, setUrlName] = useState("")
   const [content, setContent] = useState("")
 
@@ -54,8 +57,9 @@ export default function Home() {
       setRegistrant(await getRegistrant(inputRef.current.value))
       setController(await getController(inputRef.current.value))
       setEthAddress(await getEthereumAddress(inputRef.current.value))
-      setUrlName(await getUrl(inputRef.current.value))
+      setUrlName(await getText(inputRef.current.value, "url"))
       setContent(await getContentHash(inputRef.current.value))
+      setBitcoin(await getBitcoinAddress(inputRef.current.value))
     }
     
 
@@ -84,12 +88,16 @@ export default function Home() {
           <h3>ETH Adress: {ethAddress}</h3>
           {(userAddress === controller) && <input className="ethAddressField" type="text" placeholder="Enter new ETH address" ref={ethAddressRef}/>}
           {(userAddress === controller) && <button onClick={() => {setEthereumAddress(inputRef.current.value, ethAddressRef.current.value)}}>Change ETH address.</button>}
+          <h3>Bitcoin address: {bitcoin}</h3>
+          {(userAddress === controller) && <input className="btcAddressField" type="text" placeholder="Enter new BTC address" ref={bitcoinRef}/>}
+          {(userAddress === controller) && <button onClick={() => {setBitcoinAddress(inputRef.current.value, bitcoinRef.current.value)}}>Change BTC address.</button>}
           <h3>URL: {url}</h3>
           {(userAddress === controller) && <input className="urlField" type="text" placeholder="Enter new url" ref={urlRef}/>}
-          {(userAddress === controller) && <button onClick={() => {setUrl(inputRef.current.value, urlRef.current.value)}}>Change URL.</button>}
+          {(userAddress === controller) && <button onClick={() => {setText(inputRef.current.value, urlRef.current.value, "url")}}>Change URL.</button>}
           <h3>Content hash: {content}</h3>
           {(userAddress === controller) && <input className="contentField" type="text" placeholder="Enter new content hash e.g: ipfs://CF..." ref={contentHashRef}/>}
           {(userAddress === controller) && <button onClick={() => {setContentHash(inputRef.current.value, contentHashRef.current.value)}}>Change Content Hash.</button>}
+
         </div>
       </div>
       )

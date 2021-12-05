@@ -3,25 +3,17 @@ import Nav from './Nav';
 import { ethers } from "ethers";
 import { useState, useRef, useEffect } from "react";
 
-import { namehash,
-        labelhash,
-        isValidContenthash,
-        encodeContenthash,
-        decodeContenthash, } from '../utils';
-
 import { getRegistrant, getController,
         getEthereumAddress, getUrl,
         getContentHash, registerDomain,
         changeController, changeRegistrant,
-        setEthereumAddress, setUrl, setContentHash } from '../ens.js';
+        setEthereumAddress, setUrl, setContentHash, isDomainAvailable } from '../ens.js';
 
-const controllerABI = require("../contracts/RegistrarController.json");
-const registrarABI = require("../contracts/BaseRegistrarImplementation.json");
-const registryABI = require("../contracts/ENSregistryABI.json");
-const resolverABI = require("../contracts/PublicResolver.json");
 
 
 export default function Home() {
+
+  //Refs are used for knowing what is written in an input field.
   const inputRef = useRef("")
   const controllerRef = useRef("")
   const registrantRef = useRef("")
@@ -30,8 +22,6 @@ export default function Home() {
   const contentHashRef = useRef("")
 
   const [results, setResults] = useState("")
-  const [walletAddress, setWallet] = useState("");
-  const [status, setStatus] = useState("");
   const [available, setAvailable] = useState(false)
 
   const [registrant, setRegistrant] = useState("")
@@ -44,19 +34,22 @@ export default function Home() {
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
-  const controllerContract = new ethers.Contract("0xf0b08d84d2604fc2997460dcb2aef52cc3658c45", controllerABI, signer)
 
   useEffect( async() => {
+    //Handles Metamask connection.
     await provider.send("eth_requestAccounts", []);
     const address = await signer.getAddress();
     setUserAddress(address)
   }, [])
 
   const handleSubmit = async() => {
-    const isAvailable = await controllerContract.available(inputRef.current.value)
+    const isAvailable = await isDomainAvailable(inputRef.current.value)
     setAvailable(isAvailable)
+
     const result = isAvailable ? "available" : "unavailable"
     setResults(inputRef.current.value + ".theta" + " - " + result)
+
+    //If domain is not available(someone owns it), site will return qualities of domain.
     if (!available) {
       setRegistrant(await getRegistrant(inputRef.current.value))
       setController(await getController(inputRef.current.value))

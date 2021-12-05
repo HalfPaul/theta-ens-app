@@ -7,7 +7,6 @@ const ethers  = require("ethers");
 export default function QueryReverse() {
 
     const searchRef = useRef("")
-    const [userAddress, setUserAddress] = useState("")
     const [name, setName] = useState("")
 
     const handleSearch = async() => {

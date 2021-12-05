@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
-import SetupReverse from './setupReverse';
-import QueryReverse from "./queryReverse";
-import Home from './Home'
+import SetupReverse from './components/setupReverse';
+import QueryReverse from "./components/queryReverse";
+import Home from './components/Home'
 function App() {
   
   return (

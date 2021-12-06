@@ -144,6 +144,9 @@ export const setBitcoinAddress = async(domain, BTCaddress) => {
 export const getBitcoinAddress = async(domain) => {
     const name = namehash(domain + ".theta")
     const data = await resolverContract['addr(bytes32,uint256)'](name, 0)
+    if (data == "0x") {
+        return ""
+    }
     const address = formatsByCoinType[0].encoder(Buffer.from(data.slice(2), 'hex'))
     return address
 }
